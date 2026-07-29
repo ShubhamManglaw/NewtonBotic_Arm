@@ -1,0 +1,19 @@
+[1.781s] Invoking command in '/home/shubham/robot_arm_ws/src/robot_control': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shubham/robot_arm_ws/build/robot_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/robot_control build --build-base /home/shubham/robot_arm_ws/build/robot_control/build install --record /home/shubham/robot_arm_ws/build/robot_control/install.log --install-scripts $base/lib/robot_control --single-version-externally-managed install_data
+[2.209s] running egg_info
+[2.237s] writing ../../build/robot_control/robot_control.egg-info/PKG-INFO
+[2.238s] writing dependency_links to ../../build/robot_control/robot_control.egg-info/dependency_links.txt
+[2.238s] writing requirements to ../../build/robot_control/robot_control.egg-info/requires.txt
+[2.238s] writing top-level names to ../../build/robot_control/robot_control.egg-info/top_level.txt
+[2.295s] reading manifest file '../../build/robot_control/robot_control.egg-info/SOURCES.txt'
+[2.296s] writing manifest file '../../build/robot_control/robot_control.egg-info/SOURCES.txt'
+[2.297s] running build
+[2.297s] running build_py
+[2.297s] running install
+[2.306s] running install_lib
+[2.336s] running install_data
+[2.336s] running install_egg_info
+[2.368s] removing '/home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages/robot_control-0.0.0-py3.12.egg-info' (and everything under it)
+[2.368s] Copying ../../build/robot_control/robot_control.egg-info to /home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages/robot_control-0.0.0-py3.12.egg-info
+[2.369s] running install_scripts
+[2.595s] writing list of installed files to '/home/shubham/robot_arm_ws/build/robot_control/install.log'
+[2.648s] Invoked command in '/home/shubham/robot_arm_ws/src/robot_control' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shubham/robot_arm_ws/build/robot_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/robot_control build --build-base /home/shubham/robot_arm_ws/build/robot_control/build install --record /home/shubham/robot_arm_ws/build/robot_control/install.log --install-scripts $base/lib/robot_control --single-version-externally-managed install_data
