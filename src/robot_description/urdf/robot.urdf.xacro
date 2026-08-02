@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
-
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-       name="robot_arm">
-
+       name="helene_robot">
     <xacro:include filename="$(find robot_description)/urdf/materials.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/macros.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/links.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/joints.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/transmissions.xacro"/>
     <xacro:include filename="$(find robot_description)/urdf/gazebo.xacro"/>
-
 </robot>
