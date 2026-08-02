@@ -1,0 +1,32 @@
+[1.358s] Invoking command in '/home/shubham/robot_arm_ws/src/robot_control': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shubham/robot_arm_ws/build/robot_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/robot_control build --build-base /home/shubham/robot_arm_ws/build/robot_control/build install --record /home/shubham/robot_arm_ws/build/robot_control/install.log --install-scripts $base/lib/robot_control --single-version-externally-managed install_data
+[1.634s] running egg_info
+[1.634s] creating ../../build/robot_control/robot_control.egg-info
+[1.651s] writing ../../build/robot_control/robot_control.egg-info/PKG-INFO
+[1.651s] writing dependency_links to ../../build/robot_control/robot_control.egg-info/dependency_links.txt
+[1.651s] writing requirements to ../../build/robot_control/robot_control.egg-info/requires.txt
+[1.651s] writing top-level names to ../../build/robot_control/robot_control.egg-info/top_level.txt
+[1.652s] writing manifest file '../../build/robot_control/robot_control.egg-info/SOURCES.txt'
+[1.687s] reading manifest file '../../build/robot_control/robot_control.egg-info/SOURCES.txt'
+[1.687s] writing manifest file '../../build/robot_control/robot_control.egg-info/SOURCES.txt'
+[1.688s] running build
+[1.688s] running build_py
+[1.688s] creating /home/shubham/robot_arm_ws/build/robot_control/build
+[1.688s] creating /home/shubham/robot_arm_ws/build/robot_control/build/lib
+[1.688s] creating /home/shubham/robot_arm_ws/build/robot_control/build/lib/robot_control
+[1.688s] copying robot_control/__init__.py -> /home/shubham/robot_arm_ws/build/robot_control/build/lib/robot_control
+[1.688s] running install
+[1.693s] running install_lib
+[1.711s] creating /home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages/robot_control
+[1.711s] copying /home/shubham/robot_arm_ws/build/robot_control/build/lib/robot_control/__init__.py -> /home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages/robot_control
+[1.711s] byte-compiling /home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages/robot_control/__init__.py to __init__.cpython-312.pyc
+[1.711s] running install_data
+[1.712s] creating /home/shubham/robot_arm_ws/install/robot_control/share/ament_index
+[1.712s] creating /home/shubham/robot_arm_ws/install/robot_control/share/ament_index/resource_index
+[1.712s] creating /home/shubham/robot_arm_ws/install/robot_control/share/ament_index/resource_index/packages
+[1.712s] copying resource/robot_control -> /home/shubham/robot_arm_ws/install/robot_control/share/ament_index/resource_index/packages
+[1.712s] copying package.xml -> /home/shubham/robot_arm_ws/install/robot_control/share/robot_control
+[1.712s] running install_egg_info
+[1.732s] Copying ../../build/robot_control/robot_control.egg-info to /home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages/robot_control-0.0.0-py3.12.egg-info
+[1.732s] running install_scripts
+[1.847s] writing list of installed files to '/home/shubham/robot_arm_ws/build/robot_control/install.log'
+[1.879s] Invoked command in '/home/shubham/robot_arm_ws/src/robot_control' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shubham/robot_arm_ws/build/robot_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shubham/robot_arm_ws/install/robot_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/robot_control build --build-base /home/shubham/robot_arm_ws/build/robot_control/build install --record /home/shubham/robot_arm_ws/build/robot_control/install.log --install-scripts $base/lib/robot_control --single-version-externally-managed install_data

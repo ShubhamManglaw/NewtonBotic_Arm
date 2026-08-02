@@ -14,8 +14,10 @@
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
                 <geometry>
-                    <mesh filename="file:///home/shubham/robot_arm_ws/src/robot_description/meshes/${mesh}"
+                    <!-- Debugging -->
+                    <mesh filename="file:///home/shubham/robot_arm_ws/src/robot_description/meshes/${mesh}" 
                     scale="1 1 1"/>
+                    <!-- <box size="0.2 0.2 0.2"/> -->
                 </geometry>
                 <material name="grey"/>
             </visual>
