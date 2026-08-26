@@ -1,0 +1,45 @@
+[0.036s] Invoking command in '/home/shubham/NewtonBotic_Arm/build/robot_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/shubham/ros2-jazzy-learning/install/tf2_demo:/home/shubham/ros2-jazzy-learning/install/ros2_advanced:/home/shubham/ros2-jazzy-learning/install/robot_manager:/home/shubham/ros2-jazzy-learning/install/robot_bringup:/home/shubham/ros2-jazzy-learning/install/parameter_demo:/home/shubham/ros2-jazzy-learning/install/namespace_demo:/home/shubham/ros2-jazzy-learning/install/my_first_pkg:/home/shubham/ros2-jazzy-learning/install/my_robot_description:/home/shubham/ros2-jazzy-learning/install/my_robot_control:/home/shubham/ros2-jazzy-learning/install/my_robot_bringup:/home/shubham/ros2-jazzy-learning/install/motion_safety_stack:/home/shubham/ros2-jazzy-learning/install/lifecycle_demo:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/shubham/NewtonBotic_Arm/src/robot_description -DCMAKE_INSTALL_PREFIX=/home/shubham/NewtonBotic_Arm/install/robot_description
+[0.683s] -- The C compiler identification is GNU 13.3.0
+[0.863s] -- The CXX compiler identification is GNU 13.3.0
+[0.915s] -- Detecting C compiler ABI info
+[1.053s] -- Detecting C compiler ABI info - done
+[1.061s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.078s] -- Detecting C compile features
+[1.079s] -- Detecting C compile features - done
+[1.090s] -- Detecting CXX compiler ABI info
+[1.242s] -- Detecting CXX compiler ABI info - done
+[1.250s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.250s] -- Detecting CXX compile features
+[1.250s] -- Detecting CXX compile features - done
+[1.303s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[1.451s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[1.846s] -- Configuring done (1.8s)
+[1.848s] -- Generating done (0.0s)
+[1.849s] -- Build files have been written to: /home/shubham/NewtonBotic_Arm/build/robot_description
+[1.853s] Invoked command in '/home/shubham/NewtonBotic_Arm/build/robot_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/shubham/ros2-jazzy-learning/install/tf2_demo:/home/shubham/ros2-jazzy-learning/install/ros2_advanced:/home/shubham/ros2-jazzy-learning/install/robot_manager:/home/shubham/ros2-jazzy-learning/install/robot_bringup:/home/shubham/ros2-jazzy-learning/install/parameter_demo:/home/shubham/ros2-jazzy-learning/install/namespace_demo:/home/shubham/ros2-jazzy-learning/install/my_first_pkg:/home/shubham/ros2-jazzy-learning/install/my_robot_description:/home/shubham/ros2-jazzy-learning/install/my_robot_control:/home/shubham/ros2-jazzy-learning/install/my_robot_bringup:/home/shubham/ros2-jazzy-learning/install/motion_safety_stack:/home/shubham/ros2-jazzy-learning/install/lifecycle_demo:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/shubham/NewtonBotic_Arm/src/robot_description -DCMAKE_INSTALL_PREFIX=/home/shubham/NewtonBotic_Arm/install/robot_description
+[1.854s] Invoking command in '/home/shubham/NewtonBotic_Arm/build/robot_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/shubham/ros2-jazzy-learning/install/tf2_demo:/home/shubham/ros2-jazzy-learning/install/ros2_advanced:/home/shubham/ros2-jazzy-learning/install/robot_manager:/home/shubham/ros2-jazzy-learning/install/robot_bringup:/home/shubham/ros2-jazzy-learning/install/parameter_demo:/home/shubham/ros2-jazzy-learning/install/namespace_demo:/home/shubham/ros2-jazzy-learning/install/my_first_pkg:/home/shubham/ros2-jazzy-learning/install/my_robot_description:/home/shubham/ros2-jazzy-learning/install/my_robot_control:/home/shubham/ros2-jazzy-learning/install/my_robot_bringup:/home/shubham/ros2-jazzy-learning/install/motion_safety_stack:/home/shubham/ros2-jazzy-learning/install/lifecycle_demo:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/shubham/NewtonBotic_Arm/build/robot_description -- -j32 -l32
+[1.891s] Invoked command in '/home/shubham/NewtonBotic_Arm/build/robot_description' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/shubham/ros2-jazzy-learning/install/tf2_demo:/home/shubham/ros2-jazzy-learning/install/ros2_advanced:/home/shubham/ros2-jazzy-learning/install/robot_manager:/home/shubham/ros2-jazzy-learning/install/robot_bringup:/home/shubham/ros2-jazzy-learning/install/parameter_demo:/home/shubham/ros2-jazzy-learning/install/namespace_demo:/home/shubham/ros2-jazzy-learning/install/my_first_pkg:/home/shubham/ros2-jazzy-learning/install/my_robot_description:/home/shubham/ros2-jazzy-learning/install/my_robot_control:/home/shubham/ros2-jazzy-learning/install/my_robot_bringup:/home/shubham/ros2-jazzy-learning/install/motion_safety_stack:/home/shubham/ros2-jazzy-learning/install/lifecycle_demo:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/shubham/NewtonBotic_Arm/build/robot_description -- -j32 -l32
+[1.897s] Invoking command in '/home/shubham/NewtonBotic_Arm/build/robot_description': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/shubham/ros2-jazzy-learning/install/tf2_demo:/home/shubham/ros2-jazzy-learning/install/ros2_advanced:/home/shubham/ros2-jazzy-learning/install/robot_manager:/home/shubham/ros2-jazzy-learning/install/robot_bringup:/home/shubham/ros2-jazzy-learning/install/parameter_demo:/home/shubham/ros2-jazzy-learning/install/namespace_demo:/home/shubham/ros2-jazzy-learning/install/my_first_pkg:/home/shubham/ros2-jazzy-learning/install/my_robot_description:/home/shubham/ros2-jazzy-learning/install/my_robot_control:/home/shubham/ros2-jazzy-learning/install/my_robot_bringup:/home/shubham/ros2-jazzy-learning/install/motion_safety_stack:/home/shubham/ros2-jazzy-learning/install/lifecycle_demo:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/shubham/NewtonBotic_Arm/build/robot_description
+[1.908s] -- Install configuration: ""
+[1.908s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/urdf
+[1.908s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/urdf/robot.urdf
+[1.908s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes
+[1.908s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/Link_1.STL
+[1.912s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/Link_4.STL
+[1.912s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/Link_6.STL
+[1.912s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/Link_3.STL
+[1.917s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/Link_5.STL
+[1.917s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/base_link.STL
+[1.919s] -- Installing: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/meshes/Link_2.STL
+[1.927s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/launch
+[1.927s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/launch/display.launch.py
+[1.927s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/launch/rsp.launch.py
+[1.927s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/rviz
+[1.927s] -- Up-to-date: /home/shubham/NewtonBotic_Arm/install/robot_description/share/robot_description/rviz/robot.rviz
+[1.927s] [31mCMake Error at cmake_install.cmake:62 (file):
+[1.927s]   file INSTALL cannot find
+[1.927s]   "/home/shubham/NewtonBotic_Arm/src/robot_description/config": No such file
+[1.927s]   or directory.
+[1.927s] 
+[1.927s] [0m
+[1.928s] Invoked command in '/home/shubham/NewtonBotic_Arm/build/robot_description' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/shubham/ros2-jazzy-learning/install/tf2_demo:/home/shubham/ros2-jazzy-learning/install/ros2_advanced:/home/shubham/ros2-jazzy-learning/install/robot_manager:/home/shubham/ros2-jazzy-learning/install/robot_bringup:/home/shubham/ros2-jazzy-learning/install/parameter_demo:/home/shubham/ros2-jazzy-learning/install/namespace_demo:/home/shubham/ros2-jazzy-learning/install/my_first_pkg:/home/shubham/ros2-jazzy-learning/install/my_robot_description:/home/shubham/ros2-jazzy-learning/install/my_robot_control:/home/shubham/ros2-jazzy-learning/install/my_robot_bringup:/home/shubham/ros2-jazzy-learning/install/motion_safety_stack:/home/shubham/ros2-jazzy-learning/install/lifecycle_demo:/opt/ros/jazzy DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/shubham/NewtonBotic_Arm/build/robot_description
