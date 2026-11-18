@@ -1,0 +1,43 @@
+# Single source of truth for chessboard + piece geometry.
+# Every node (world generator, manipulation, game) loads THIS file via
+# chess_simulation.board.BoardGeometry. Do not hard-code square coordinates elsewhere.
+#
+# chessboard_frame convention
+#   origin : centre of the board, on the TOP playing surface
+#   +X     : toward the h-file   (file a -> h)
+#   +Y     : toward rank 8       (rank 1 -> 8)
+#   square centre (file f=0..7, rank r=0..7) = ((f-3.5)*s, (r-3.5)*s, 0)
+# board.pose places chessboard_frame in the world (the robot base is at world origin).
+board:
+  square_size: 0.030       # m
+  thickness: 0.010         # m, board sits on the ground; top surface z = thickness
+  border: 0.012            # m, frame around the 8x8 squares
+  pose: {x: 0.0, y: 0.220, yaw: 3.141592653589793}   # yaw=pi: rank 8 nearest the robot (robot plays black)
+
+pieces:
+  # Every piece shares the same base and grasp body so one grasp works for all.
+  base_radius: 0.011
+  base_height: 0.006
+  body_radius: 0.0075      # grasp cylinder (fingers close on this)
+  grasp_height: 0.016      # above board top: centre of the finger contact
+  mass: 0.020              # kg
+  friction: 1.2
+  height:                  # total height per piece type
+    P: 0.030
+    R: 0.034
+    N: 0.038
+    B: 0.042
+    Q: 0.046
+    K: 0.050
+  color:
+    white: [0.92, 0.88, 0.78, 1.0]
+    black: [0.12, 0.10, 0.10, 1.0]
+
+graveyard:
+  # Captured pieces go in a 2 x 8 grid beside the board, one side per colour
+  # (white's beside the a-file, black's beside the h-file). Rows run from
+  # first_row_y toward rank 1, in chessboard_frame Y. The rows sit nearer the
+  # robot than the board centre because that region is more reachable.
+  gap: 0.030               # from the board's outer edge to the first column
+  spacing: 0.030           # between columns and between rows
+  first_row_y: 0.160

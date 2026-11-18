@@ -1,0 +1,9 @@
+# Human move in UCI (e2e4, e7e8q) or SAN (e4, Nf3, O-O).
+string move
+---
+bool accepted
+string message
+string human_move_uci
+string robot_move_uci     # '' if the game is over or the robot failed
+string fen                # committed board state after this exchange
+string status             # ONGOING | CHECKMATE | STALEMATE | DRAW | ROBOT_FAILURE

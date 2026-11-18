@@ -1,0 +1,14 @@
+# Execute an ordered list of piece relocations (one chess move may need several:
+# capture = REMOVE + MOVE, castling = 2 x MOVE, promotion = MOVE + REPLACE).
+string request_id
+PieceMove[] moves
+---
+bool success
+uint32 moves_completed
+string failure_stage      # stage reached when it failed (e.g. GRASP, LIFT, PLACE)
+string failure_category   # INVALID | PLANNING | CONTROLLER | GRASP | RELEASE | VERIFY | CANCELLED | WORLD
+string message
+---
+uint32 move_index
+string piece_id
+string stage

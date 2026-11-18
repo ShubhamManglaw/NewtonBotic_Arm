@@ -1,0 +1,10 @@
+# Planning limits (scaled below URDF limits for smooth, safe simulated motion).
+default_velocity_scaling_factor: 0.5
+default_acceleration_scaling_factor: 0.5
+joint_limits:
+  Joint0: {has_velocity_limits: true, max_velocity: 2.0, has_acceleration_limits: true, max_acceleration: 3.0}
+  Joint1: {has_velocity_limits: true, max_velocity: 2.0, has_acceleration_limits: true, max_acceleration: 3.0}
+  Joint2: {has_velocity_limits: true, max_velocity: 2.5, has_acceleration_limits: true, max_acceleration: 3.0}
+  Joint3: {has_velocity_limits: true, max_velocity: 3.0, has_acceleration_limits: true, max_acceleration: 4.0}
+  Joint4: {has_velocity_limits: true, max_velocity: 3.5, has_acceleration_limits: true, max_acceleration: 4.0}
+  Joint5: {has_velocity_limits: true, max_velocity: 4.0, has_acceleration_limits: true, max_acceleration: 4.0}

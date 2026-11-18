@@ -1,0 +1,7 @@
+# Swap a piece's simulation model for another kind (promotion), keeping its pose.
+string piece_id
+string new_kind           # Q R B N
+---
+bool success
+string new_piece_id
+string message
