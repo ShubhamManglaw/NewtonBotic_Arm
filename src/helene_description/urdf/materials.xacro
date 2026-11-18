@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <material name="helene_grey"><color rgba="0.72 0.72 0.74 1"/></material>
+  <material name="helene_dark"><color rgba="0.25 0.25 0.27 1"/></material>
+  <material name="helene_light"><color rgba="0.88 0.88 0.88 1"/></material>
+  <material name="helene_alu"><color rgba="0.80 0.82 0.85 1"/></material>
+</robot>

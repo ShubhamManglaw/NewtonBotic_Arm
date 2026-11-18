@@ -29,15 +29,13 @@ def _world(context):
         PythonLaunchDescriptionSource(os.path.join(bringup, 'launch', 'sim_moveit.launch.py')),
         launch_arguments={'world': path,
                           'headless': LaunchConfiguration('headless'),
-                          'rviz': LaunchConfiguration('rviz'),
-                          'use_gripper': LaunchConfiguration('use_gripper')}.items())]
+                          'rviz': LaunchConfiguration('rviz')}.items())]
 
 
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('headless', default_value='false'),
         DeclareLaunchArgument('rviz', default_value='true'),
-        DeclareLaunchArgument('use_gripper', default_value='false'),
         OpaqueFunction(function=_world),
         Node(package='ros_gz_bridge', executable='parameter_bridge',
              name='chess_world_bridge', output='screen',

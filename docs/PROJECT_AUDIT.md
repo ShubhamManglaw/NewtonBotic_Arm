@@ -113,3 +113,50 @@ Launch command: `ros2 launch robot_bringup gazebo.launch.py`, which loads `empty
 - The Xacro is split into `newtonbotic_arm.xacro` (links and joints), `arm.ros2_control.xacro` and `arm.gazebo.xacro`. The entry point `robot.urdf.xacro` takes the args `use_gazebo` and `use_gripper`.
 - Removed the stale duplicates `robot.urdf`, `robot.urdf.backup` and `gazebo.launch.py.save` (they remain in git history).
 - §7.3 (skewed CAD zero pose) is kept on purpose: it is consistent, and named poses will be defined in the SRDF.
+
+## 9. Robot swap: HELENE arm + gripper (branch `helene-arm-swap`)
+
+The original CAD arm (`Joint0..5`, `Link_1..6`, `tool0`) was replaced by the HELENE model from `helene_description` (commit `bf83584`).
+
+### Integration
+
+- `src/helene_description` is a trimmed, vendored package that keeps the upstream package name.
+- Its generated xacro, `materials.xacro` and meshes are copied unmodified. See `VENDORED.md` and `tools/sync_helene_description.sh`.
+- `robot_description/urdf/robot.urdf.xacro` instantiates `<xacro:helene_arm parent="world"/>` and adds the project-owned ros2_control and Gazebo files.
+
+### Name mapping (old → new)
+
+| Old | New | Notes |
+|---|---|---|
+| Joint0 | joint1 | base yaw, +Z |
+| Joint1 | joint2 | shoulder, +Y |
+| Joint2 | joint3 | elbow, −Y |
+| Joint3 | joint4 | forearm roll, +X |
+| Joint4 | joint5 | wrist pitch, −Y |
+| Joint5 | joint6 | tool roll, +X |
+| base_link | base_link | |
+| Link_1…Link_6 | link1…link6 | |
+| tool0 (flange, +Z out) | tcp (between the pads, **+X** = approach) | `gripper_base` sits between link6 and tcp |
+| none | finger_r_joint / finger_l_joint | prismatic, 0–0.02 m each, positive = open |
+
+### Model checks against helene AGENTS.md (all passed)
+
+- The chain, axes and positions match the spec table.
+- TCP at zero is (0.3558, −0.0003, 0.3452).
+- `ready` = [0, 11, 0.46, 0, −79.46, 0]° puts the TCP at (0.232, 0, 0.150) with +X pointing down. This was confirmed both offline and by Gazebo TF.
+- All inertias are positive-definite and satisfy the triangle inequality, and every centre of mass lies inside its mesh.
+- Finger visual and collision geometry agree. The racks cross the centreline near the pinion by design and have no collision geometry there.
+- The pads give a 0 mm gap at 0 and 40 mm at 0.02.
+
+### Finding: start-up stick of finger_l in Gazebo (not a model defect, mitigated in this project)
+
+- **Symptom:** with both fingers spawned at 0, their lower limit, where the pad faces coincide exactly at y=0, `finger_l_joint` ignored commands under gz_ros2_control until both fingers had been closed together once. `finger_r_joint` tracked every command. This was reproduced 3 times.
+- **Not the axis:** flipping finger_l's axis sign in a scratch copy did not fix it.
+- **Fix:** starting both fingers at 0.005 m (`initial_value` in `robot_description/urdf/arm.ros2_control.xacro`) fixed it completely. Every command was then tracked, including 40 mm and 0 mm.
+- The generated model was not edited.
+
+### Chess adaptations
+
+- **Board:** moved in front of the arm along +X (centre (0.22, 0), yaw +90°, rank 8 nearest the robot). The 30 mm squares are kept: all 64 squares and all 32 graveyard slots are reachable top-down with the real TCP.
+- **Grasp height:** 24 mm. The pads span TCP ±16 mm, so this puts them on the 15 mm body, clear of the 22 mm base disc. At 20 mm the pads pinched the base rim (fingers stopped at a 22 mm gap).
+- **Gripper control:** `JointGroupPositionController` on both fingers with equal values, so jaw gap = 2 × value. Open 12 mm/finger, close target 6 mm/finger (force-limited squeeze), and "holding" means the fingers stopped wider than 6.8 mm.

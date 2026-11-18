@@ -3,8 +3,8 @@
   <name>robot_description</name>
   <version>1.0.0</version>
   <description>
-    Robot description package for the 6-DOF robotic arm.
-    Contains URDF, meshes, RViz configuration, and launch files.
+    Robot description wrapper for the HELENE 6-DOF arm + gripper (model from
+    helene_description): ros2_control, Gazebo plugins, RViz config and launch files.
   </description>
 
   <maintainer email="Shubhammanglaw@gmail.com">Shubham</maintainer>
@@ -19,6 +19,7 @@
   <depend>joint_state_publisher_gui</depend>
   <depend>rviz2</depend>
   <depend>xacro</depend>
+  <exec_depend>helene_description</exec_depend>
 
   <!-- Launch system -->
   <exec_depend>launch</exec_depend>

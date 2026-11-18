@@ -20,6 +20,8 @@
   <exec_depend>controller_manager</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>position_controllers</exec_depend>
+  <exec_depend>helene_description</exec_depend>
   <exec_depend>newtonbotic_moveit_config</exec_depend>
   <exec_depend>chess_simulation</exec_depend>
   <exec_depend>chess_manipulation</exec_depend>

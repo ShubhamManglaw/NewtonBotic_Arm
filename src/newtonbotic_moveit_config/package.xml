@@ -2,7 +2,7 @@
 <package format="3">
   <name>newtonbotic_moveit_config</name>
   <version>1.0.0</version>
-  <description>MoveIt 2 configuration for the NewtonBotic 6-DOF arm.</description>
+  <description>MoveIt 2 configuration for the HELENE 6-DOF arm + gripper.</description>
   <maintainer email="Shubhammanglaw@gmail.com">Shubham</maintainer>
   <license>Apache-2.0</license>
 

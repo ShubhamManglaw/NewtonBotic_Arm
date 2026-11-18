@@ -1,6 +1,6 @@
 # NewtonBotic Arm: Simulated Chess-Playing Robot
 
-A 6-DOF arm (from SolidWorks CAD) that plays chess against a human in Gazebo Sim, with MoveIt 2 for motion planning.
+The HELENE 6-DOF arm with a parallel-jaw gripper plays chess against a human in Gazebo Sim, with MoveIt 2 for motion planning. The robot model comes from `helene_description`, vendored in `src/helene_description` (see its `VENDORED.md`).
 
 Stack: ROS 2 Jazzy · Gazebo Harmonic (gz sim 8) · ros2_control · MoveIt 2 · python-chess (+ Stockfish, optional)
 
@@ -9,20 +9,16 @@ Stack: ROS 2 Jazzy · Gazebo Harmonic (gz sim 8) · ros2_control · MoveIt 2 · 
 | Phase | State |
 |---|---|
 | 0 Audit | Done. See [docs/PROJECT_AUDIT.md](docs/PROJECT_AUDIT.md) |
-| 1 Robot description | Done. Base frame fixed, collision hulls, `tool0` flange |
-| 2 Gripper | **Waiting for gripper CAD** (see "Integrating the gripper") |
+| 1 Robot description | HELENE arm + gripper (generated from Fusion CAD), wrapped with project ros2_control and Gazebo files |
+| 2 Gripper | Done. Two commanded prismatic fingers (no mimic), jaw gap = 2 × finger value, 0–40 mm |
 | 3 Chess world | Done. Generated board and 32 pieces, reset, promotion swap |
-| 4 MoveIt 2 | Done for the arm. Plan and execute verified to ≤0.4 mm |
-| 5 Pick and place | Pipeline done. Real grasping needs the gripper; runs in `teleport` test mode for now |
-| 6 Game controller | Done. Validates and verifies before commit; unit tested |
-| 7 End-to-end loop | Works in `teleport` test mode |
-| 8 Special moves | Captures, castling, en passant and promotion are planned and tested in logic and in sim (teleport) |
+| 4 MoveIt 2 | Done. Arm group joint1–6 to `tcp`, gripper group, ACM regenerated |
+| 5 Pick and place | Done with **real pure-friction grasps** (verified in Gazebo) |
+| 6 Game controller | Done. Validate → execute → verify whole board → commit; Stockfish |
+| 7 End-to-end loop | Done (human move + robot reply executed with the real gripper) |
+| 8 Special moves | Captures, castling, en passant and promotion are planned, and tested in sim |
 
-> **`teleport` mode is a test mode.**
-> - The arm performs every real motion: pre-grasp, approach, lift, transfer, lower and retreat.
-> - The piece itself is moved by Gazebo `set_pose`. Nothing grips it.
-> - This mode proves the planning, sequencing, verification and game logic. It does **not** prove that grasping works.
-> - Use `execution_mode:=gripper` once the gripper is integrated.
+`execution_mode:=teleport` remains as a **test-only** mode. The arm moves for real, but pieces are moved by Gazebo `set_pose`. It is useful for debugging game flow apart from grasping.
 
 ## Setup
 
@@ -56,7 +52,7 @@ Other entry points:
 | `ros2 launch robot_bringup gazebo.launch.py headless:=true` | Arm and controllers in an empty world |
 | `ros2 launch robot_bringup sim_moveit.launch.py` | The above plus MoveIt |
 | `ros2 launch robot_bringup chess_sim.launch.py` | Chess world plus MoveIt, no game |
-| `ros2 run chess_manipulation reachability --ros-args -p tcp_offset:=0.11` | IK reachability of every square |
+| `ros2 run chess_manipulation reachability` | IK reachability of every square |
 | `ros2 run chess_manipulation motion_check` | MoveIt plan/execute accuracy test |
 | `python3 tools/integration_scenarios.py` | Capture, castling, promotion and failure scenarios |
 | `ros2 service call /chess_world/reset std_srvs/srv/Trigger` | Restore the start position |
@@ -88,7 +84,7 @@ chess_interfaces (PieceMove, PieceState, ExecuteMoves, SubmitMove, …)
 - **Manipulation.** Each piece move runs these stages: VALIDATE → PRE_GRASP → OPEN → APPROACH → CLOSE → VERIFY_GRASP → LIFT → VERIFY_LIFT → TRANSFER → LOWER → RELEASE → RETREAT → VERIFY_PLACE.
   - A failure returns its stage, a category (INVALID, PLANNING, CONTROLLER, GRASP, RELEASE, VERIFY, WORLD or CANCELLED) and a message.
   - Free-space motion uses OMPL. Vertical motion and level transfer use Cartesian paths.
-  - The board, the trays and every piece are in the MoveIt planning scene, and a held piece is attached to `tool0`.
+  - The board, the trays and every piece are in the MoveIt planning scene, and a held piece is attached to `tcp`.
 
 ### Board convention (`chess_simulation/config/board.yaml`)
 
@@ -98,24 +94,19 @@ chess_interfaces (PieceMove, PieceState, ExecuteMoves, SubmitMove, …)
   - **+Y:** toward rank 8.
   - **Square centres:** `((f-3.5)s, (r-3.5)s)`.
 - The squares are 30 mm, scaled down to the arm's reach.
-- The board centre is at world (0, 0.22). It is rotated 180°, so **rank 8 faces the robot**: the robot plays black and the human sits at rank 1.
+- The board centre is at world (0.22, 0), in front of the arm along +X. It is rotated +90°, so **rank 8 faces the robot**: the robot plays black and the human sits at rank 1.
 - Captured pieces go to two 2×8 trays beside the board.
 - Piece IDs are stable, e.g. `white_pawn_e2`. Promoted pieces get IDs like `white_queen_promo1`.
 
-## Integrating the gripper (Phase 2)
+## Robot model (HELENE)
 
-What's needed from the gripper CAD: STL meshes for the palm and fingers, plus a URDF export.
-
-1. Add `robot_description/urdf/gripper.xacro` defining `<xacro:macro name="gripper" params="parent">`, mounted on `tool0`.
-   - `tool0` is the Link_6 flange face, with +Z pointing out of the flange.
-   - The fingers need real collision geometry and high friction, because grasping is pure friction.
-2. Add a `gripper_controller` (`position_controllers/GripperActionController`) to `robot_bringup/config/controllers.yaml`, and the finger joint to `arm.ros2_control.xacro`.
-3. In the SRDF, add a `gripper` group and an end-effector, and regenerate the ACM with `collisions_updater`.
-4. In `chess_manipulation/config/manipulation.yaml`, set:
-   - `tcp_offset`: the distance from `tool0` to the fingertip grasp centre;
-   - `gripper.open_position`, `close_position` and `holding_min_position`.
-
-   Then run with `execution_mode:=gripper use_gripper:=true`.
-5. Run `reachability` with the real `tcp_offset`. All 64 squares are reachable up to about 0.14 m; a1/h1 fail at 0.17 m. If needed, move the board via `board.pose.y`.
-
-Piece grasp body: a Ø15 mm cylinder whose grasp centre is 16 mm above the board. Pieces weigh 20 g and are spaced 30 mm apart; diagonal neighbours are 42 mm apart, and the gripper approaches along the diagonal. The fingers must open wider than 15 mm and fit in the gaps between neighbouring pieces.
+- **Chain:** `world → base_link → link1…link6 → gripper_base → finger_r / finger_l + tcp`.
+- **Joints:**
+  - `joint1`–`joint6` are revolute.
+  - `finger_r_joint` and `finger_l_joint` are prismatic, 0–0.02 m each, positive = open.
+- **Zero pose:** an "L" (upper arm vertical, forearm along +X).
+- **`ready` pose:** [0, 11, 0.46, 0, −79.46, 0]° puts the TCP at (0.232, 0, 0.150), pointing down. This is the rest pose between moves.
+- **Tool frame:** `tcp`, between the pads. Its **+X axis is the approach direction** and +Y is the jaw axis.
+- **Gripper command:** publish `std_msgs/Float64MultiArray` `[v, v]` to `/gripper_controller/commands`. Jaw gap = 2v.
+- **Generated files:** `helene_description.xacro` and the meshes are generated upstream, so don't edit them here. Regenerate in the source repo, then run `tools/sync_helene_description.sh <checkout>`.
+- **Limits:** effort and velocity limits are CAD design estimates.

@@ -1,33 +1,27 @@
 <?xml version="1.0"?>
 <!--
-  Entry point for the NewtonBotic arm description.
+  Entry point for the robot description: HELENE 6-DOF arm + parallel-jaw gripper.
+
+  The arm/gripper model itself (links, joints, meshes, tcp frame) comes unmodified
+  from the helene_description package (generated from CAD; see its VENDORED.md).
+  This wrapper adds only project-owned parts: ros2_control and Gazebo plugins.
 
   Args:
-    use_gazebo        include ros2_control + gz_ros2_control plugin (default true)
+    use_gazebo        include ros2_control (gz_ros2_control) + Gazebo plugin/contacts (default true)
     controllers_file  controller YAML loaded by gz_ros2_control
-    use_gripper       include the gripper (gripper.xacro, mounted on tool0).
-                      Default false until the gripper CAD is integrated.
 -->
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="newtonbotic_arm">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="helene">
 
   <xacro:arg name="use_gazebo" default="true"/>
   <xacro:arg name="controllers_file" default="$(find robot_bringup)/config/controllers.yaml"/>
-  <xacro:arg name="use_gripper" default="false"/>
 
-  <xacro:include filename="$(find robot_description)/urdf/newtonbotic_arm.xacro"/>
+  <xacro:include filename="$(find helene_description)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find helene_description)/urdf/helene_description.xacro"/>
   <xacro:include filename="$(find robot_description)/urdf/arm.ros2_control.xacro"/>
   <xacro:include filename="$(find robot_description)/urdf/arm.gazebo.xacro"/>
 
   <link name="world"/>
-
-  <xacro:newtonbotic_arm parent="world">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </xacro:newtonbotic_arm>
-
-  <xacro:if value="$(arg use_gripper)">
-    <xacro:include filename="$(find robot_description)/urdf/gripper.xacro"/>
-    <xacro:gripper parent="tool0"/>
-  </xacro:if>
+  <xacro:helene_arm parent="world"/>
 
   <xacro:if value="$(arg use_gazebo)">
     <xacro:arm_ros2_control/>

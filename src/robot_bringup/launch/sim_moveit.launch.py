@@ -15,17 +15,16 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
     bringup = get_package_share_directory('robot_bringup')
     moveit = get_package_share_directory('newtonbotic_moveit_config')
-    names = ['headless', 'world', 'use_gripper', 'rviz']
-    defaults = ['false', 'empty.sdf', 'false', 'true']
+    names = ['headless', 'world', 'rviz']
+    defaults = ['false', 'empty.sdf', 'true']
     args = [DeclareLaunchArgument(n, default_value=d) for n, d in zip(names, defaults)]
     cfg = {n: LaunchConfiguration(n) for n in names}
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(bringup, 'launch', 'gazebo.launch.py')),
-        launch_arguments={k: cfg[k] for k in ('headless', 'world', 'use_gripper')}.items())
+        launch_arguments={k: cfg[k] for k in ('headless', 'world')}.items())
     move_group = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(moveit, 'launch', 'move_group.launch.py')),
-        launch_arguments={'use_sim_time': 'true', 'use_gripper': cfg['use_gripper'],
-                          'rviz': cfg['rviz']}.items())
+        launch_arguments={'use_sim_time': 'true', 'rviz': cfg['rviz']}.items())
     # Give Gazebo / controllers a head start so MoveIt sees joint states at startup.
     return LaunchDescription(args + [gazebo, TimerAction(period=8.0, actions=[move_group])])

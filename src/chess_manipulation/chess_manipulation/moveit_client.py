@@ -31,7 +31,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from shape_msgs.msg import SolidPrimitive
 
-ARM_JOINTS = ['Joint0', 'Joint1', 'Joint2', 'Joint3', 'Joint4', 'Joint5']
+ARM_JOINTS = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']
 
 
 def spin_in_background(node: Node) -> MultiThreadedExecutor:
@@ -57,7 +57,7 @@ class MotionResult:
 
 
 class MoveItClient:
-    def __init__(self, node: Node, group: str = 'arm', ee_link: str = 'tool0',
+    def __init__(self, node: Node, group: str = 'arm', ee_link: str = 'tcp',
                  frame: str = 'world', joint_names: Sequence[str] = ARM_JOINTS):
         self.node = node
         self.group = group

@@ -1,10 +1,13 @@
-# Planning limits (scaled below URDF limits for smooth, safe simulated motion).
+# Planning limits. Velocities = URDF limits (CAD design estimates, not measured);
+# accelerations are planning choices. Scaled further by the default factors below.
 default_velocity_scaling_factor: 0.5
 default_acceleration_scaling_factor: 0.5
 joint_limits:
-  Joint0: {has_velocity_limits: true, max_velocity: 2.0, has_acceleration_limits: true, max_acceleration: 3.0}
-  Joint1: {has_velocity_limits: true, max_velocity: 2.0, has_acceleration_limits: true, max_acceleration: 3.0}
-  Joint2: {has_velocity_limits: true, max_velocity: 2.5, has_acceleration_limits: true, max_acceleration: 3.0}
-  Joint3: {has_velocity_limits: true, max_velocity: 3.0, has_acceleration_limits: true, max_acceleration: 4.0}
-  Joint4: {has_velocity_limits: true, max_velocity: 3.5, has_acceleration_limits: true, max_acceleration: 4.0}
-  Joint5: {has_velocity_limits: true, max_velocity: 4.0, has_acceleration_limits: true, max_acceleration: 4.0}
+  joint1: {has_velocity_limits: true, max_velocity: 1.5, has_acceleration_limits: true, max_acceleration: 3.0}
+  joint2: {has_velocity_limits: true, max_velocity: 1.2, has_acceleration_limits: true, max_acceleration: 3.0}
+  joint3: {has_velocity_limits: true, max_velocity: 1.5, has_acceleration_limits: true, max_acceleration: 3.0}
+  joint4: {has_velocity_limits: true, max_velocity: 2.0, has_acceleration_limits: true, max_acceleration: 4.0}
+  joint5: {has_velocity_limits: true, max_velocity: 2.0, has_acceleration_limits: true, max_acceleration: 4.0}
+  joint6: {has_velocity_limits: true, max_velocity: 3.0, has_acceleration_limits: true, max_acceleration: 4.0}
+  finger_r_joint: {has_velocity_limits: true, max_velocity: 0.05, has_acceleration_limits: true, max_acceleration: 0.5}
+  finger_l_joint: {has_velocity_limits: true, max_velocity: 0.05, has_acceleration_limits: true, max_acceleration: 0.5}

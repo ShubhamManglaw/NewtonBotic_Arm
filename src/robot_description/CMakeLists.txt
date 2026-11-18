@@ -14,12 +14,6 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-# Install meshes
-install(
-  DIRECTORY meshes
-  DESTINATION share/${PROJECT_NAME}
-)
-
 # Install launch files
 install(
   DIRECTORY launch

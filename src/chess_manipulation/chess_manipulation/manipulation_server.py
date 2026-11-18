@@ -18,16 +18,17 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 import rclpy
-from control_msgs.action import GripperCommand
 from geometry_msgs.msg import Point, Pose
-from rclpy.action import ActionClient, ActionServer, CancelResponse, GoalResponse
+from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Float64MultiArray
 
 from chess_interfaces.action import ExecuteMoves
 from chess_interfaces.msg import PieceMove, PieceState
 from chess_interfaces.srv import GetPieceStates, ReplacePiece, SetPiecePose
-from chess_manipulation.geometry import tool_pose_for_tcp
+from chess_manipulation.geometry import tcp_pose
 from chess_manipulation.moveit_client import MoveItClient, spin_in_background
 from chess_simulation.board import BoardGeometry
 
@@ -48,7 +49,6 @@ class ManipulationServer(Node):
     def __init__(self):
         super().__init__('chess_manipulation')
         p = self.declare_parameter
-        self.tcp = p('tcp_offset', 0.11).value
         self.approach_h = p('approach_height', 0.06).value
         self.transport_h = p('transport_height', 0.10).value
         self.release_clear = p('release_clearance', 0.002).value
@@ -58,12 +58,13 @@ class ManipulationServer(Node):
         self.rest_joints = list(p('rest_joints', [0.0] * 6).value)
         self.mode = p('execution_mode', 'teleport').value
         self.place_tol = p('place_tolerance', 0.006).value
-        self.g_action = p('gripper.action', '/gripper_controller/gripper_cmd').value
-        self.g_open = p('gripper.open_position', 0.0).value
-        self.g_close = p('gripper.close_position', 0.0).value
-        self.g_effort = p('gripper.max_effort', 5.0).value
-        self.g_hold_min = p('gripper.holding_min_position', 0.0).value
-        self.g_settle = p('gripper.settle_time', 0.5).value
+        self.g_topic = p('gripper.command_topic', '/gripper_controller/commands').value
+        self.g_joints = list(p('gripper.joints', ['finger_r_joint', 'finger_l_joint']).value)
+        self.g_open = p('gripper.open_position', 0.012).value
+        self.g_close = p('gripper.close_position', 0.006).value
+        self.g_hold_min = p('gripper.holding_min_position', 0.0068).value
+        self.g_timeout = p('gripper.timeout', 5.0).value
+        self.g_settle = p('gripper.settle_time', 0.3).value
         vel = p('velocity_scaling', 0.4).value
         acc = p('acceleration_scaling', 0.4).value
 
@@ -77,7 +78,10 @@ class ManipulationServer(Node):
                                                callback_group=cb)
         self._teleport_cli = self.create_client(SetPiecePose, '/chess_world/set_piece_pose',
                                                 callback_group=cb)
-        self._gripper = ActionClient(self, GripperCommand, self.g_action, callback_group=cb)
+        self._g_pub = self.create_publisher(Float64MultiArray, self.g_topic, 10)
+        self._fingers = {}
+        self._fingers_lock = threading.Lock()
+        self.create_subscription(JointState, '/joint_states', self._on_js, 10, callback_group=cb)
         self._busy = threading.Lock()
         self._scene_ready = False
         self._server = ActionServer(
@@ -88,7 +92,7 @@ class ManipulationServer(Node):
             self.get_logger().warn(
                 'execution_mode=teleport: TEST MODE. Arm motions are real, but pieces are '
                 'moved by Gazebo set_pose, not grasped. Not evidence of grasp capability.')
-        self.get_logger().info(f'manipulation server ready (mode={self.mode}, tcp={self.tcp})')
+        self.get_logger().info(f'manipulation server ready (mode={self.mode}, ee=tcp)')
 
     # =============================================================== plumbing
     def _call(self, client, req, timeout=10.0):
@@ -155,7 +159,7 @@ class ManipulationServer(Node):
         """Best effort: back away upward and release anything attached in the scene."""
         try:
             for pid in self._attached():
-                self.mc.detach(pid, 'tool0')
+                self.mc.detach(pid, 'tcp')
             cur = self.mc.current_joints(1.0)
             if cur is not None:
                 self.mc.move_to_joints(self.rest_joints)
@@ -213,10 +217,10 @@ class ManipulationServer(Node):
         base_yaw = self.geo.yaw
         for off in self.yaw_offsets:
             yaw = base_yaw + off
-            q_grasp = self.mc.compute_ik(tool_pose_for_tcp(x, y, z, yaw, self.tcp), attempts=3)
+            q_grasp = self.mc.compute_ik(tcp_pose(x, y, z, yaw), attempts=3)
             if q_grasp is None:
                 continue
-            ok = all(self.mc.compute_ik(tool_pose_for_tcp(x, y, z + h, yaw, self.tcp),
+            ok = all(self.mc.compute_ik(tcp_pose(x, y, z + h, yaw),
                                         seed=q_grasp) is not None
                      for h in (self.approach_h, self.transport_h - self.geo.grasp_height))
             if ok:
@@ -241,25 +245,25 @@ class ManipulationServer(Node):
         g = self._plan_grasp(x, y, gz)
         self._yaw = g.yaw
         self._stage('PRE_GRASP')
-        pre = self.mc.compute_ik(tool_pose_for_tcp(x, y, gz + self.approach_h, g.yaw, self.tcp),
+        pre = self.mc.compute_ik(tcp_pose(x, y, gz + self.approach_h, g.yaw),
                                  seed=g.grasp_q)
         self._move_joints('PRE_GRASP', pre)
         self._stage('OPEN')
         self._gripper_cmd('OPEN', self.g_open)
         self._stage('APPROACH')
         # Target piece was excluded from the scene; neighbours are still checked.
-        self._move_linear('APPROACH', tool_pose_for_tcp(x, y, gz, g.yaw, self.tcp))
+        self._move_linear('APPROACH', tcp_pose(x, y, gz, g.yaw))
         self._stage('CLOSE')
         pos = self._gripper_cmd('CLOSE', self.g_close)
         self._stage('VERIFY_GRASP')
         if self.mode == 'gripper' and pos is not None and pos <= self.g_hold_min:
             raise StageError('VERIFY_GRASP', 'GRASP',
-                             f'fingers closed to {pos:.4f} (<= {self.g_hold_min}): nothing held')
+                             f'fingers closed to {pos:.4f} m each (<= {self.g_hold_min}): '
+                             'nothing between the pads')
         self._attach_scene(pid, kind, x, y, base_z)
         self._holding = True
         self._stage('LIFT')
-        self._move_linear('LIFT', tool_pose_for_tcp(x, y, base_z + self.transport_h,
-                                                    g.yaw, self.tcp))
+        self._move_linear('LIFT', tcp_pose(x, y, base_z + self.transport_h, g.yaw))
         self._stage('VERIFY_LIFT')
         if self.mode == 'gripper':
             time.sleep(0.3)
@@ -273,7 +277,7 @@ class ManipulationServer(Node):
         top = base_z + self.transport_h
         place_z = self._grasp_z(base_z) + self.release_clear
         self._stage('TRANSFER')
-        transfer = tool_pose_for_tcp(x, y, top, self._yaw, self.tcp)
+        transfer = tcp_pose(x, y, top, self._yaw)
         r = self.mc.move_cartesian([transfer])
         if not r.ok:   # fall back to a collision-aware free-space plan at the same pose
             q = self.mc.compute_ik(transfer, attempts=3)
@@ -281,7 +285,7 @@ class ManipulationServer(Node):
                 raise StageError('TRANSFER', 'PLANNING', 'no IK above destination')
             self._move_joints('TRANSFER', q)
         self._stage('LOWER')
-        self._move_linear('LOWER', tool_pose_for_tcp(x, y, place_z, self._yaw, self.tcp))
+        self._move_linear('LOWER', tcp_pose(x, y, place_z, self._yaw))
         self._stage('RELEASE')
         if self.mode == 'teleport':
             res = self._call(self._teleport_cli, SetPiecePose.Request(
@@ -289,13 +293,12 @@ class ManipulationServer(Node):
             if res is None or not res.success:
                 raise StageError('RELEASE', 'WORLD', f'teleport of {pid} failed')
         self._gripper_cmd('RELEASE', self.g_open)
-        self.mc.detach(pid, 'tool0')
+        self.mc.detach(pid, 'tcp')
         self._holding = False
         self._stage('RETREAT')
         # The released piece is now back in the planning scene directly below the
         # fingers, so the short vertical retreat skips collision checking.
-        self._move_linear('RETREAT', tool_pose_for_tcp(x, y, place_z + self.approach_h,
-                                                       self._yaw, self.tcp),
+        self._move_linear('RETREAT', tcp_pose(x, y, place_z + self.approach_h, self._yaw),
                           avoid_collisions=False)
 
     def _verify_place(self, mv, dest, label):
@@ -329,26 +332,51 @@ class ManipulationServer(Node):
         self.get_logger().info(f'    {res.message}')
 
     # ------------------------------------------------------------ gripper
+    def _on_js(self, msg: JointState):
+        with self._fingers_lock:
+            for n, q in zip(msg.name, msg.position):
+                if n in self.g_joints:
+                    self._fingers[n] = q
+
+    def _finger_positions(self):
+        with self._fingers_lock:
+            if all(j in self._fingers for j in self.g_joints):
+                return [self._fingers[j] for j in self.g_joints]
+        return None
+
     def _gripper_cmd(self, stage, position) -> Optional[float]:
+        """Command BOTH fingers to `position` (m per finger; jaw gap = 2x) and wait until
+        they stop. Returns the mean finger position, so a value larger than commanded
+        means the fingers were stopped by an object.
+        """
         if self.mode == 'teleport':
             return None
-        if not self._gripper.wait_for_server(timeout_sec=5.0):
-            raise StageError(stage, 'CONTROLLER', f'gripper action {self.g_action} unavailable')
-        goal = GripperCommand.Goal()
-        goal.command.position = float(position)
-        goal.command.max_effort = float(self.g_effort)
-        ev = threading.Event()
-        fut = self._gripper.send_goal_async(goal)
-        fut.add_done_callback(lambda _: ev.set())
-        if not ev.wait(10.0) or not fut.result().accepted:
-            raise StageError(stage, 'CONTROLLER', 'gripper goal rejected')
-        ev2 = threading.Event()
-        rf = fut.result().get_result_async()
-        rf.add_done_callback(lambda _: ev2.set())
-        if not ev2.wait(self.stage_timeout):
-            raise StageError(stage, 'CONTROLLER', 'gripper timed out')
-        time.sleep(self.g_settle)
-        return rf.result().result.position
+        cmd = Float64MultiArray(data=[float(position)] * len(self.g_joints))
+        t0 = time.monotonic()
+        last, still_since = None, None
+        while time.monotonic() - t0 < self.g_timeout:
+            self._g_pub.publish(cmd)
+            time.sleep(0.05)
+            cur = self._finger_positions()
+            if cur is None:
+                continue
+            if last is not None and max(abs(a - b) for a, b in zip(cur, last)) < 2e-5:
+                still_since = still_since or time.monotonic()
+                if time.monotonic() - still_since >= self.g_settle:
+                    break
+            else:
+                still_since = None
+            last = cur
+        else:
+            raise StageError(stage, 'CONTROLLER',
+                             f'gripper did not settle within {self.g_timeout}s (fingers={last})')
+        if abs(last[0] - last[1]) > 0.002:
+            raise StageError(stage, 'CONTROLLER',
+                             f'fingers asymmetric: {self.g_joints}={[round(v, 4) for v in last]}')
+        mean = sum(last) / len(last)
+        self.get_logger().info(f'    gripper {stage}: cmd {position:.4f} -> fingers '
+                               f'{[round(v, 4) for v in last]} (gap {2000 * mean:.1f} mm)')
+        return mean
 
     # -------------------------------------------------------- planning scene
     def _update_scene(self, states: Dict[str, PieceState], exclude: str):
@@ -390,7 +418,7 @@ class ManipulationServer(Node):
         p.position.x, p.position.y, p.position.z = x, y, base_z + h / 2
         p.orientation.w = 1.0
         self.mc.add_objects([self.mc.cylinder(pid, h, self.geo.pieces['base_radius'], p)])
-        self.mc.attach(pid, 'tool0', touch_links=['tool0', 'Link_6', 'Link_5'])
+        self.mc.attach(pid, 'tcp', touch_links=['finger_r', 'finger_l', 'gripper_base', 'link6'])
 
     # ---------------------------------------------------------- graveyard
     def _free_graveyard_slot(self, color, states) -> int:

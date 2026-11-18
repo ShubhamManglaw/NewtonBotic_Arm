@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>helene_description</name>
+  <version>0.1.0</version>
+  <description>
+    HELENE 6-DOF arm + parallel-jaw gripper model (generated xacro + meshes only),
+    vendored from github.com/ShubhamManglaw/helene_description. See VENDORED.md.
+  </description>
+  <maintainer email="robotics.club@rishihood.edu.in">Rishihood Robotics Club</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>xacro</exec_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -5,8 +5,9 @@
   # then, in another terminal:
   ros2 run chess_game play
 
-execution_mode:=teleport (default until the gripper is integrated) is a TEST MODE:
-arm motions are real but pieces are moved by Gazebo set_pose.
+execution_mode:=gripper (default) grasps pieces by friction with the real gripper.
+execution_mode:=teleport is a TEST MODE: arm motions are real but pieces are moved
+by Gazebo set_pose (useful to debug game flow independently of grasping).
 """
 import os
 
@@ -27,7 +28,7 @@ def generate_launch_description():
     sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(bringup, 'launch', 'chess_sim.launch.py')),
         launch_arguments={k: LaunchConfiguration(k)
-                          for k in ('headless', 'rviz', 'use_gripper')}.items())
+                          for k in ('headless', 'rviz')}.items())
     manip = Node(package='chess_manipulation', executable='manipulation_server',
                  name='chess_manipulation', output='screen',
                  parameters=[manip_cfg, {'use_sim_time': True,
@@ -37,8 +38,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('headless', default_value='false'),
         DeclareLaunchArgument('rviz', default_value='true'),
-        DeclareLaunchArgument('use_gripper', default_value='false'),
-        DeclareLaunchArgument('execution_mode', default_value='teleport',
+        DeclareLaunchArgument('execution_mode', default_value='gripper',
                               description="'gripper' or 'teleport' (TEST ONLY)"),
         sim,
         TimerAction(period=15.0, actions=[manip, game]),

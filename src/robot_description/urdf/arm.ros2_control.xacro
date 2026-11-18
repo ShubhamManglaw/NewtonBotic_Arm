@@ -1,24 +1,35 @@
 <?xml version="1.0"?>
-<!-- ros2_control interfaces for the 6 arm joints (Gazebo Sim system). -->
+<!--
+  ros2_control interfaces (Gazebo Sim system) for the HELENE arm + gripper.
+  Gripper: finger_r_joint and finger_l_joint are BOTH commanded (no <mimic>), always
+  with equal values in metres per finger: jaw gap = 2 x finger value (0..0.02 -> 0..40 mm).
+
+  Fingers start slightly open (initial_value 0.005 = 10 mm gap). Spawning exactly at
+  the closed limit (pads in exact contact at y=0) left finger_l stuck in Gazebo
+  Harmonic until both fingers had been cycled once (reproduced 3x; see
+  docs/PROJECT_AUDIT.md section 9). Starting off the limit removes it.
+-->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:macro name="arm_ros2_control" params="name:=RobotSystem plugin:=gz_ros2_control/GazeboSimSystem">
     <ros2_control name="${name}" type="system">
       <hardware>
         <plugin>${plugin}</plugin>
       </hardware>
-      <xacro:macro name="pos_joint" params="joint">
+      <xacro:macro name="pos_joint" params="joint initial:=0.0">
         <joint name="${joint}">
           <command_interface name="position"/>
-          <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+          <state_interface name="position"><param name="initial_value">${initial}</param></state_interface>
           <state_interface name="velocity"/>
         </joint>
       </xacro:macro>
-      <xacro:pos_joint joint="Joint0"/>
-      <xacro:pos_joint joint="Joint1"/>
-      <xacro:pos_joint joint="Joint2"/>
-      <xacro:pos_joint joint="Joint3"/>
-      <xacro:pos_joint joint="Joint4"/>
-      <xacro:pos_joint joint="Joint5"/>
+      <xacro:pos_joint joint="joint1"/>
+      <xacro:pos_joint joint="joint2"/>
+      <xacro:pos_joint joint="joint3"/>
+      <xacro:pos_joint joint="joint4"/>
+      <xacro:pos_joint joint="joint5"/>
+      <xacro:pos_joint joint="joint6"/>
+      <xacro:pos_joint joint="finger_r_joint" initial="0.005"/>
+      <xacro:pos_joint joint="finger_l_joint" initial="0.005"/>
     </ros2_control>
   </xacro:macro>
 </robot>

@@ -1,20 +1,19 @@
-"""Shared MoveItConfigsBuilder for the NewtonBotic arm (imported by launch files)."""
+"""Shared MoveItConfigsBuilder for the HELENE arm (imported by launch files)."""
 import os
 
 from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 
 
-def build(use_gripper='false', use_gazebo='true'):
+def build(use_gazebo='true'):
     xacro = os.path.join(get_package_share_directory('robot_description'),
                          'urdf', 'robot.urdf.xacro')
     return (
-        MoveItConfigsBuilder('newtonbotic_arm',
+        MoveItConfigsBuilder('helene',
                              package_name='newtonbotic_moveit_config')
         .robot_description(file_path=xacro,
-                           mappings={'use_gripper': use_gripper,
-                                     'use_gazebo': use_gazebo})
-        .robot_description_semantic(file_path='config/newtonbotic_arm.srdf')
+                           mappings={'use_gazebo': use_gazebo})
+        .robot_description_semantic(file_path='config/helene.srdf')
         .robot_description_kinematics(file_path='config/kinematics.yaml')
         .joint_limits(file_path='config/joint_limits.yaml')
         .trajectory_execution(file_path='config/moveit_controllers.yaml')

@@ -1,4 +1,4 @@
-"""Start move_group (and optionally RViz) for the NewtonBotic arm.
+"""Start move_group (and optionally RViz) for the HELENE arm.
 
 Assumes the controllers are already running (e.g. robot_bringup gazebo.launch.py).
 """
@@ -17,8 +17,7 @@ import moveit_config  # noqa: E402
 
 def _setup(context):
     use_sim_time = LaunchConfiguration('use_sim_time').perform(context) == 'true'
-    cfg = moveit_config.build(
-        use_gripper=LaunchConfiguration('use_gripper').perform(context))
+    cfg = moveit_config.build()
     sim = {'use_sim_time': use_sim_time}
 
     move_group = Node(
@@ -42,7 +41,6 @@ def _setup(context):
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true'),
-        DeclareLaunchArgument('use_gripper', default_value='false'),
         DeclareLaunchArgument('rviz', default_value='false'),
         OpaqueFunction(function=_setup),
     ])

@@ -1,4 +1,6 @@
 # Must match robot_bringup/config/controllers.yaml controller names exactly.
+# Only the arm is executed through MoveIt. The gripper (JointGroupPositionController,
+# /gripper_controller/commands) is commanded directly by chess_manipulation.
 moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
 
 moveit_simple_controller_manager:
@@ -9,4 +11,4 @@ moveit_simple_controller_manager:
     type: FollowJointTrajectory
     action_ns: follow_joint_trajectory
     default: true
-    joints: [Joint0, Joint1, Joint2, Joint3, Joint4, Joint5]
+    joints: [joint1, joint2, joint3, joint4, joint5, joint6]

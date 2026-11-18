@@ -8,18 +8,21 @@
 #   +Y     : toward rank 8       (rank 1 -> 8)
 #   square centre (file f=0..7, rank r=0..7) = ((f-3.5)*s, (r-3.5)*s, 0)
 # board.pose places chessboard_frame in the world (the robot base is at world origin).
+# HELENE's zero pose points along +X, so the board sits in front of the robot along +X.
 board:
   square_size: 0.030       # m
   thickness: 0.010         # m, board sits on the ground; top surface z = thickness
   border: 0.012            # m, frame around the 8x8 squares
-  pose: {x: 0.0, y: 0.220, yaw: 3.141592653589793}   # yaw=pi: rank 8 nearest the robot (robot plays black)
+  pose: {x: 0.220, y: 0.0, yaw: 1.5707963267948966}  # yaw=+90deg: rank 8 nearest the robot (robot plays black)
 
 pieces:
   # Every piece shares the same base and grasp body so one grasp works for all.
   base_radius: 0.011
   base_height: 0.006
   body_radius: 0.0075      # grasp cylinder (fingers close on this)
-  grasp_height: 0.016      # above board top: centre of the finger contact
+  grasp_height: 0.024      # tcp height above board top. The HELENE pads span tcp +/-16 mm
+                           # (8..40 mm), so they grip the 15 mm body, clear of the 22 mm base disc
+                           # (0..6 mm). The 76 mm-wide housing stays 73 mm up, above the king (50 mm).
   mass: 0.020              # kg
   friction: 1.2
   height:                  # total height per piece type
