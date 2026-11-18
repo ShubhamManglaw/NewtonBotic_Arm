@@ -4,6 +4,10 @@ The HELENE 6-DOF arm with a parallel-jaw gripper plays chess against a human in 
 
 Stack: ROS 2 Jazzy · Gazebo Harmonic (gz sim 8) · ros2_control · MoveIt 2 · python-chess (+ Stockfish, optional)
 
+![HELENE arm at the ready pose over the chessboard in Gazebo](docs/images/gazebo_helene_ready_oblique.png)
+
+*Gazebo Harmonic (headless Ogre2 render): HELENE at `ready`, gripper open, standard start position.*
+
 ## Status
 
 | Phase | State |

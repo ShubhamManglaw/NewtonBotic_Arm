@@ -129,9 +129,11 @@ def board_model_sdf(geo: BoardGeometry) -> str:
         for sq_r in range(8):
             bx, by = (sq_f - 3.5) * s, (sq_r - 3.5) * s
             dark = (sq_f + sq_r) % 2 == 0       # a1 is dark
+            # 1 mm tiles spanning t-0.9 mm .. t+0.1 mm, i.e. just above the frame
+            # visual (top at t-1 mm) so they are not hidden inside it.
             squares.append(
                 f'<visual name="sq_{"abcdefgh"[sq_f]}{sq_r + 1}">'
-                f'<pose>{bx:.4f} {by:.4f} {t / 2 + 0.0005:.4f} 0 0 0</pose>'
+                f'<pose>{bx:.4f} {by:.4f} {t - 0.0004:.4f} 0 0 0</pose>'
                 f'<geometry><box><size>{s:.4f} {s:.4f} 0.001</size></box></geometry>'
                 f'{_material(DARK_SQ if dark else LIGHT_SQ)}</visual>')
     return f"""
