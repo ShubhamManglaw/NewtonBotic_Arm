@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>chess_game</name>
+  <version>1.0.0</version>
+  <description>Authoritative chess game state, move validation, engine, and the game node.</description>
+  <maintainer email="Shubhammanglaw@gmail.com">Shubham</maintainer>
+  <license>Apache-2.0</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>chess_interfaces</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <!-- python-chess is not packaged for Ubuntu 24.04: install it with pip (see README). -->
+  <exec_depend>stockfish</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

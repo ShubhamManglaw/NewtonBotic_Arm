@@ -1,0 +1,30 @@
+chess_manipulation:
+  ros__parameters:
+    # Distance along tool0 +Z from the flange to the grasp centre between the
+    # fingertips. PLACEHOLDER until the gripper CAD is integrated.
+    tcp_offset: 0.11
+    # Heights of the TCP above the board top surface (m)
+    approach_height: 0.060     # pre-grasp / retreat, above the grasp point
+    transport_height: 0.100    # carrying height; clears tallest piece (0.050) + carried piece
+    release_clearance: 0.002   # carried piece's base this far above the board when released
+    # Parallel jaws close along the board diagonal by default, where neighbouring
+    # pieces are farthest away (42 mm vs 30 mm). Other yaw offsets are tried if IK fails.
+    grasp_yaw_offsets_deg: [45.0, 135.0, -45.0, -135.0, 0.0, 90.0]
+    velocity_scaling: 0.4
+    acceleration_scaling: 0.4
+    stage_timeout: 30.0
+    # Arm joints at rest between moves (CAD zero pose = arm upright)
+    rest_joints: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    # 'gripper'  : real friction grasp with the gripper controller (requires gripper)
+    # 'teleport' : TEST ONLY. Arm performs every motion but the piece is moved by
+    #              Gazebo set_pose at release time. Validates planning + game flow,
+    #              NOT grasping.
+    execution_mode: teleport
+    gripper:
+      action: /gripper_controller/gripper_cmd   # control_msgs/action/GripperCommand
+      open_position: 0.0       # PLACEHOLDER: set from the gripper model
+      close_position: 0.0      # PLACEHOLDER: commanded closed (past the piece, effort-limited)
+      max_effort: 5.0
+      holding_min_position: 0.0  # PLACEHOLDER: if fingers close beyond this, nothing was grasped
+      settle_time: 0.5
+    place_tolerance: 0.006     # m, max XY error of placed piece vs square centre

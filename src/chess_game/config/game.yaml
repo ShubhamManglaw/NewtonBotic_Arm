@@ -1,0 +1,8 @@
+chess_game:
+  ros__parameters:
+    robot_color: black      # human plays white (sits at rank 1, opposite the robot)
+    engine_path: ''         # '' = auto-detect stockfish (/usr/games/stockfish); else fallback policy
+    think_time: 0.5         # s per engine move
+    skill_level: 5          # Stockfish 0..20
+    seed: 0                 # fallback policy RNG seed
+    move_timeout: 300.0     # s allowed for one physical move (incl. captures/castling)

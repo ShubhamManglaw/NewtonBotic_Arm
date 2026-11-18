@@ -1,0 +1,7 @@
+# TEST/DEBUG ONLY: teleport a piece (used by manipulation execution_mode=teleport
+# while no gripper exists). Places the piece upright with its base at `position`.
+string piece_id
+geometry_msgs/Point position
+---
+bool success
+string message

@@ -22,6 +22,8 @@
   <exec_depend>joint_trajectory_controller</exec_depend>
   <exec_depend>newtonbotic_moveit_config</exec_depend>
   <exec_depend>chess_simulation</exec_depend>
+  <exec_depend>chess_manipulation</exec_depend>
+  <exec_depend>chess_game</exec_depend>
   <exec_depend>launch</exec_depend>
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ament_index_python</exec_depend>

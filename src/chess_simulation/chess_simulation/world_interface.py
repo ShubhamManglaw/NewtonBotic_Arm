@@ -10,6 +10,7 @@ ROS API (node name: chess_world)
   ~/get_piece_states  chess_interfaces/srv/GetPieceStates
   ~/reset             std_srvs/srv/Trigger     restore the standard start position
   ~/replace_piece     chess_interfaces/srv/ReplacePiece   (promotion)
+  ~/set_piece_pose    chess_interfaces/srv/SetPiecePose   (TEST ONLY: teleport)
   TF  world -> chessboard_frame  (static)
 """
 import math
@@ -29,7 +30,7 @@ from std_srvs.srv import Trigger
 from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 
 from chess_interfaces.msg import PieceState
-from chess_interfaces.srv import GetPieceStates, ReplacePiece
+from chess_interfaces.srv import GetPieceStates, ReplacePiece, SetPiecePose
 from chess_simulation.board import PIECE_NAMES, BoardGeometry, PieceSpec
 from chess_simulation.world_gen import WORLD_NAME, piece_model_sdf
 
@@ -66,6 +67,7 @@ class ChessWorld(Node):
                             callback_group=cb)
         self.create_service(Trigger, '~/reset', self._reset, callback_group=cb)
         self.create_service(ReplacePiece, '~/replace_piece', self._replace, callback_group=cb)
+        self.create_service(SetPiecePose, '~/set_piece_pose', self._teleport, callback_group=cb)
 
         self._tf = StaticTransformBroadcaster(self)
         t = TransformStamped()
@@ -209,6 +211,19 @@ class ChessWorld(Node):
         res.success = not bad
         res.message = 'board reset to start position' if not bad else '; '.join(bad)
         self.get_logger().info(f'reset: {res.message}')
+        return res
+
+    def _teleport(self, req, res):
+        if req.piece_id not in self.registry:
+            res.success, res.message = False, f'unknown piece {req.piece_id}'
+            return res
+        p = req.position
+        self._set_pose(req.piece_id, (p.x, p.y, p.z + 0.001))
+        time.sleep(0.5)
+        pose = self.pose_of(req.piece_id)
+        ok = pose is not None and math.dist(pose[0][:2], (p.x, p.y)) < 0.003
+        res.success = ok
+        res.message = 'teleported' if ok else 'pose not confirmed'
         return res
 
     # ----------------------------------------------------------- promotion

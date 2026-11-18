@@ -11,6 +11,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetPieceStates.srv"
   "srv/ReplacePiece.srv"
   "srv/SubmitMove.srv"
+  "srv/SetPiecePose.srv"
   "action/ExecuteMoves.action"
   DEPENDENCIES geometry_msgs
 )
