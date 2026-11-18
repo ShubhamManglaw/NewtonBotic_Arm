@@ -1,191 +1,120 @@
-import xacro
+"""Spawn the NewtonBotic arm in Gazebo Sim (Harmonic) with ros2_control.
+
+Usage:
+  ros2 launch robot_bringup gazebo.launch.py                 # with GUI
+  ros2 launch robot_bringup gazebo.launch.py headless:=true  # server only
+  ros2 launch robot_bringup gazebo.launch.py world:=/abs/path/world.sdf
+"""
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
-from launch.actions import (
-    IncludeLaunchDescription,
-    SetEnvironmentVariable,
-    RegisterEventHandler,
-)
+from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
+                            RegisterEventHandler, SetEnvironmentVariable)
+from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-
+from launch.substitutions import (Command, LaunchConfiguration,
+                                  PythonExpression)
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
+    pkg_description = get_package_share_directory('robot_description')
+    pkg_bringup = get_package_share_directory('robot_bringup')
+    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
-    pkg_robot_description = get_package_share_directory(
-        "robot_description"
-    )
+    headless = LaunchConfiguration('headless')
+    world = LaunchConfiguration('world')
+    use_gripper = LaunchConfiguration('use_gripper')
+    controllers_file = LaunchConfiguration('controllers_file')
 
-    pkg_ros_gz_sim = get_package_share_directory(
-        "ros_gz_sim"
-    )
+    args = [
+        DeclareLaunchArgument('headless', default_value='false',
+                              description='Run gz server only (no GUI)'),
+        DeclareLaunchArgument('world', default_value='empty.sdf',
+                              description='SDF world file'),
+        DeclareLaunchArgument('use_gripper', default_value='false'),
+        DeclareLaunchArgument(
+            'controllers_file',
+            default_value=os.path.join(pkg_bringup, 'config', 'controllers.yaml')),
+        DeclareLaunchArgument('spawn_x', default_value='0.0'),
+        DeclareLaunchArgument('spawn_y', default_value='0.0'),
+        DeclareLaunchArgument('spawn_z', default_value='0.0'),
+    ]
 
+    # Let Gazebo resolve package://robot_description/... mesh URIs.
+    resource_path = os.path.dirname(pkg_description)
+    env = [
+        SetEnvironmentVariable(
+            'GZ_SIM_RESOURCE_PATH',
+            resource_path + os.pathsep + os.environ.get('GZ_SIM_RESOURCE_PATH', '')),
+    ]
 
-    # Gazebo resource path
-
-    pkg_share_parent = os.path.dirname(
-        pkg_robot_description
-    )
-
-
-    gz_resource_env = SetEnvironmentVariable(
-        "GZ_SIM_RESOURCE_PATH",
-        pkg_share_parent
-    )
-
-
-    ign_resource_env = SetEnvironmentVariable(
-        "IGN_GAZEBO_RESOURCE_PATH",
-        pkg_share_parent
-    )
-
-
-    # Robot description
-
-    xacro_file = os.path.join(
-        pkg_robot_description,
-        "urdf",
-        "robot.urdf.xacro"
-    )
-
-    robot_desc = xacro.process_file(xacro_file).toxml()
-
-
-
-    # Robot state publisher
+    robot_description = ParameterValue(
+        Command([
+            'xacro ', os.path.join(pkg_description, 'urdf', 'robot.urdf.xacro'),
+            ' use_gazebo:=true',
+            ' use_gripper:=', use_gripper,
+            ' controllers_file:=', controllers_file,
+        ]),
+        value_type=str)
 
     robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="screen",
-        parameters=[
-            {
-                "robot_description": robot_desc,
-                "use_sim_time": True,
-            }
-        ],
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_description,
+                     'use_sim_time': True}],
     )
 
-
-
-    # Gazebo
-
+    gz_args = PythonExpression([
+        "'-r -v 2 ' + ('-s ' if '", headless, "' == 'true' else '') + '", world, "'"])
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(
-                pkg_ros_gz_sim,
-                "launch",
-                "gz_sim.launch.py",
-            )
-        ),
-        launch_arguments={
-            "gz_args": "-r empty.sdf"
-        }.items(),
+            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
+        launch_arguments={'gz_args': gz_args,
+                          'on_exit_shutdown': 'true'}.items(),
     )
-
-
-
-    # Spawn robot
 
     spawn_robot = Node(
-        package="ros_gz_sim",
-        executable="create",
-        arguments=[
-            "-topic",
-            "robot_description",
-            "-name",
-            "NewtonBotic_Arm",
-            "-z",
-            "0.0",
-        ],
-        output="screen",
+        package='ros_gz_sim',
+        executable='create',
+        arguments=['-topic', 'robot_description',
+                   '-name', 'NewtonBotic_Arm',
+                   '-x', LaunchConfiguration('spawn_x'),
+                   '-y', LaunchConfiguration('spawn_y'),
+                   '-z', LaunchConfiguration('spawn_z')],
+        output='screen',
     )
 
+    def spawner(name):
+        return Node(package='controller_manager', executable='spawner',
+                    arguments=[name, '--controller-manager-timeout', '60'],
+                    output='screen')
 
-
-    # Controller spawners
-    #
-    # IMPORTANT:
-    # No --param-file here.
-    # gz_ros2_control already loads controllers.yaml
-
-
-    joint_state_broadcaster_spawner = Node(
-    package="controller_manager",
-    executable="spawner",
-    arguments=[
-        "joint_state_broadcaster",
-    ],
-    output="screen",
-)
-
-
-    arm_controller_spawner = Node(
-    package="controller_manager",
-    executable="spawner",
-    arguments=[
-        "arm_controller",
-    ],
-    output="screen",
-)
-
-
-
-    load_joint_state_broadcaster = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=spawn_robot,
-            on_exit=[
-                joint_state_broadcaster_spawner
-            ],
-        )
-    )
-
-
-
-    load_arm_controller = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster_spawner,
-            on_exit=[
-                arm_controller_spawner
-            ],
-        )
-    )
-
-
-
-    # Clock bridge
+    jsb = spawner('joint_state_broadcaster')
+    arm = spawner('arm_controller')
+    gripper = Node(package='controller_manager', executable='spawner',
+                   arguments=['gripper_controller',
+                              '--controller-manager-timeout', '60'],
+                   output='screen', condition=IfCondition(use_gripper))
 
     bridge = Node(
-        package="ros_gz_bridge",
-        executable="parameter_bridge",
-        arguments=[
-            "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock"
-        ],
-        output="screen",
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        output='screen',
     )
 
-
-
-    return LaunchDescription(
-        [
-            gz_resource_env,
-            ign_resource_env,
-
-            bridge,
-
-            robot_state_publisher,
-
-            gazebo,
-
-            spawn_robot,
-
-            load_joint_state_broadcaster,
-
-            load_arm_controller,
-        ]
-    )
+    return LaunchDescription(args + env + [
+        bridge,
+        robot_state_publisher,
+        gazebo,
+        spawn_robot,
+        RegisterEventHandler(OnProcessExit(target_action=spawn_robot,
+                                           on_exit=[jsb])),
+        RegisterEventHandler(OnProcessExit(target_action=jsb,
+                                           on_exit=[arm, gripper])),
+    ])
