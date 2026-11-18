@@ -1,6 +1,0 @@
-[31mCMake Error at cmake_install.cmake:62 (file):
-  file INSTALL cannot find
-  "/home/shubham/NewtonBotic_Arm/src/robot_description/config": No such file
-  or directory.
-
-[0m

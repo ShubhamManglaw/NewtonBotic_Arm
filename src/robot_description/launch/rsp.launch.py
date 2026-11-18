@@ -3,20 +3,19 @@ from launch_ros.actions import Node
 
 from ament_index_python.packages import get_package_share_directory
 import os
+import xacro
 
 
 def generate_launch_description():
-
     pkg_share = get_package_share_directory("robot_description")
 
-    urdf_file = os.path.join(
+    xacro_file = os.path.join(
         pkg_share,
         "urdf",
-        "robot.urdf"
+        "robot.urdf.xacro"
     )
 
-    with open(urdf_file, "r") as infp:
-        robot_description = infp.read()
+    robot_description = xacro.process_file(xacro_file).toxml()
 
     robot_state_publisher = Node(
         package="robot_state_publisher",

@@ -7,7 +7,7 @@
     Contains URDF, meshes, RViz configuration, and launch files.
   </description>
 
-  <maintainer email="your_email@example.com">Shubham</maintainer>
+  <maintainer email="Shubhammanglaw@gmail.com">Shubham</maintainer>
   <license>Apache-2.0</license>
 
   <!-- Build tool -->

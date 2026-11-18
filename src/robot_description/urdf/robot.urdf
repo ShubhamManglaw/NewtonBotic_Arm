@@ -360,9 +360,9 @@
 
 <gazebo>
   <plugin
-      filename="gz_ros2_control-system"
-      name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-    <parameters>/home/shubham/NewtonBotic_Arm/arm_controllers.yaml</parameters>
+    filename="gz_ros2_control-system"
+    name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+    <parameters>$(find robot_bringup)/config/controllers.yaml</parameters>
   </plugin>
 </gazebo>
 </robot>
