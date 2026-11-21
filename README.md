@@ -43,6 +43,10 @@ source install/setup.bash
 # Full system: Gazebo + arm + MoveIt + manipulation + game (add headless:=true rviz:=false for no GUI)
 ros2 launch robot_bringup chess_game.launch.py
 
+# About 5 s after the arm stack is ready, a startup demo runs: the arm picks the e2 pawn,
+# places it on e4, then carries it back to e2. Options:
+#   startup_demo:=false   demo_delay:=5.0   demo_move:=e2e4   demo_return:=true
+
 # In a second terminal: play as white
 ros2 run chess_game play
 #   your move> e4        (UCI or SAN; also: board, new, quit)

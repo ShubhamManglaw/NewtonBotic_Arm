@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
             'reachability = chess_manipulation.reachability:main',
             'motion_check = chess_manipulation.motion_check:main',
+            'startup_demo = chess_manipulation.startup_demo:main',
             'manipulation_server = chess_manipulation.manipulation_server:main',
         ],
     },
